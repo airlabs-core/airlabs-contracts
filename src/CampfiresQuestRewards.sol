@@ -88,6 +88,8 @@ contract CampfiresQuestRewards is ERC1155 {
         uint256 nonce,
         bytes calldata signature
     ) external {
+        if (questRewards[id].tokenId == 0) revert InvalidTokenID();
+
         address recovered = ECDSA.recover(
             ECDSA.toEthSignedMessageHash(
                 keccak256(abi.encode(_msgSender(), id, nonce))
@@ -99,9 +101,7 @@ contract CampfiresQuestRewards is ERC1155 {
             "recovered addr does not match verifier"
         );
 
-        if (questRewards[id].tokenId == 0) revert InvalidTokenID();
-
-        _mint(_msgSender(), id, 1, "0x00");
+        _mint(_msgSender(), id, 1, signature);
         claimedQuestRewards[_msgSender()][id] = true;
 
         emit ClaimQuestReward();
