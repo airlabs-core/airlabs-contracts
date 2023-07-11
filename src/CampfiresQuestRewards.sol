@@ -11,7 +11,7 @@ contract CampfiresQuestRewards is ERC1155 {
     struct QuestReward {
         uint256 tokenId;
         string uri;
-        uint256 maxClaimed;
+        uint256 maxClaimed; // TODO: Will probably remove
         address payable author;
         uint256 price;
     }
@@ -89,10 +89,15 @@ contract CampfiresQuestRewards is ERC1155 {
         bytes calldata signature
     ) external {
         address recovered = ECDSA.recover(
-            keccak256(abi.encodePacked(_msgSender(), id, nonce)),
+            ECDSA.toEthSignedMessageHash(
+                keccak256(abi.encode(_msgSender(), id, nonce))
+            ),
             signature
         );
-        require(recovered == verifier);
+        require(
+            recovered == verifier,
+            "recovered addr does not match verifier"
+        );
 
         if (questRewards[id].tokenId == 0) revert InvalidTokenID();
 
