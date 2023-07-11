@@ -2,6 +2,7 @@
 pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 contract CampfiresQuestRewards is ERC1155 {
     /* ---------------------------------------- */
@@ -14,16 +15,30 @@ contract CampfiresQuestRewards is ERC1155 {
         address payable author;
         uint256 price;
     }
+    /* -----------------*****------------------ */
+
+    /* ---------------------------------------- */
+    /*                  ERRORS                  */
+    /* ---------------------------------------- */
+    error InvalidTokenID();
+    /* -----------------*****------------------ */
 
     /* ---------------------------------------- */
     /*                PROPERTIES                */
     /* ---------------------------------------- */
+    /// @notice Signature verifier.
+    address public verifier;
+
+    /// @notice Stores all created quest rewards.
     mapping(uint256 => QuestReward) public questRewards;
+
+    /// @notice Records claimed quest rewards for an account.
+    mapping(address => mapping(uint256 => bool)) public claimedQuestRewards;
 
     /// @notice The next token ID to be minted.
     uint256 private _currentIndex;
 
-    string private _baseURI;
+    /* -----------------*****------------------ */
 
     /* ---------------------------------------- */
     /*                  EVENTS                  */
@@ -34,23 +49,29 @@ contract CampfiresQuestRewards is ERC1155 {
         address indexed author,
         uint256 price
     );
-    event MintQuest();
+    event ClaimQuestReward();
 
-    constructor(string memory baseURI) ERC1155("") {
+    /* -----------------*****------------------ */
+
+    constructor(address _verifier) ERC1155("") {
+        require(_verifier != address(0), "empty verifier address");
         _currentIndex = 1;
-        _baseURI = baseURI;
+        verifier = _verifier;
     }
 
     /* ---------------------------------------- */
     /*             PUBLIC FUNCTIONS             */
     /* ---------------------------------------- */
     function uri(
-        string calldata id
-    ) public view virtual returns (string memory) {
-        return string(abi.encodePacked(_baseURI, id));
+        uint256 id
+    ) public view virtual override returns (string memory) {
+        return string(abi.encodePacked(questRewards[id].uri, id));
     }
 
-    function createQuest(string calldata tokenURI, uint256 price) external {
+    function createQuestReward(
+        string calldata tokenURI,
+        uint256 price
+    ) external {
         questRewards[_currentIndex] = QuestReward(
             _currentIndex,
             tokenURI,
@@ -62,8 +83,23 @@ contract CampfiresQuestRewards is ERC1155 {
         _currentIndex++;
     }
 
-    function mintQuest(uint256 id) external {
+    function claimQuestReward(
+        uint256 id,
+        uint256 nonce,
+        bytes calldata signature
+    ) external {
+        address recovered = ECDSA.recover(
+            keccak256(abi.encodePacked(_msgSender(), id, nonce)),
+            signature
+        );
+        require(recovered == verifier);
+
+        if (questRewards[id].tokenId == 0) revert InvalidTokenID();
+
         _mint(_msgSender(), id, 1, "0x00");
-        emit MintQuest();
+        claimedQuestRewards[_msgSender()][id] = true;
+
+        emit ClaimQuestReward();
     }
+    /* -----------------*****------------------ */
 }
