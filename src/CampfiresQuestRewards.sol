@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "./interfaces/ICampfiresExperiencePoints.sol";
 
 contract CampfiresQuestRewards is ERC1155 {
     /* ---------------------------------------- */
@@ -13,7 +14,8 @@ contract CampfiresQuestRewards is ERC1155 {
         string uri;
         uint256 maxClaimed; // TODO: Will probably remove
         address payable author;
-        uint256 price;
+        uint256 price; // ? Price is for what?
+        uint256 experiencePoints; 
     }
     /* -----------------*****------------------ */
 
@@ -26,6 +28,9 @@ contract CampfiresQuestRewards is ERC1155 {
     /* ---------------------------------------- */
     /*                PROPERTIES                */
     /* ---------------------------------------- */
+    /// @notice Contract address for experience points.
+    address public campfiresExperiencePoints;
+
     /// @notice Signature verifier.
     address public verifier;
 
@@ -53,10 +58,19 @@ contract CampfiresQuestRewards is ERC1155 {
 
     /* -----------------*****------------------ */
 
-    constructor(address _verifier) ERC1155("") {
-        require(_verifier != address(0), "empty verifier address");
+    constructor(
+        address _verifier,
+        address _campfiresExperiencePoints
+    ) ERC1155("") {
+        require(_verifier != address(0), "_verifier empty addr");
+        require(
+            _campfiresExperiencePoints != address(0),
+            "_campfiresExperiencePoints empty addr"
+        );
+
         _currentIndex = 1;
         verifier = _verifier;
+        campfiresExperiencePoints = _campfiresExperiencePoints;
     }
 
     /* ---------------------------------------- */
@@ -68,16 +82,19 @@ contract CampfiresQuestRewards is ERC1155 {
         return string(abi.encodePacked(questRewards[id].uri, id));
     }
 
+    // ? Should anyone be allowed to set arbitrary value for experience points of a quest reward?
     function createQuestReward(
         string calldata tokenURI,
-        uint256 price
+        uint256 price,
+        uint256 experiencePoints
     ) external {
         questRewards[_currentIndex] = QuestReward(
             _currentIndex,
             tokenURI,
             0,
             payable(_msgSender()),
-            price
+            price,
+            experiencePoints
         );
         emit CreateQuest(_currentIndex, tokenURI, _msgSender(), price);
         _currentIndex++;
@@ -102,6 +119,10 @@ contract CampfiresQuestRewards is ERC1155 {
         );
 
         _mint(_msgSender(), id, 1, signature);
+        ICampfiresExperiencePoints(campfiresExperiencePoints).mintTo(
+            _msgSender(),
+            questRewards[id].experiencePoints
+        );
         claimedQuestRewards[_msgSender()][id] = true;
 
         emit ClaimQuestReward();
