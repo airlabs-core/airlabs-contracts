@@ -3,14 +3,17 @@
   "solidity.packageDefaultDependenciesDirectory": "lib",
   "solidity.remappings": [
     "forge-std/=lib/forge-std/src/",
-    "@openzeppelin/=lib/openzeppelin-contracts/"
+    "@openzeppelin/=lib/openzeppelin-contracts/",
+    "erc721a/=lib/erc721a/"
   ],
   "solidity.remappingsUnix": [
     "forge-std/=lib/forge-std/src/",
-    "@openzeppelin/=lib/openzeppelin-contracts/"
+    "@openzeppelin/=lib/openzeppelin-contracts/",
+    "erc721a/=lib/erc721a/"
   ],
   "solidity.remappingsWindows": [
     "forge-std/=lib/forge-std/src/",
-    "@openzeppelin/=lib/openzeppelin-contracts/"
+    "@openzeppelin/=lib/openzeppelin-contracts/",
+    "erc721a/=lib/erc721a/"
   ],
 }
