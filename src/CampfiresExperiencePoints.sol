@@ -1,110 +1,53 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
-contract CampfiresExperiencePoints is ERC20 {
-    /* ---------------------------------------- */
-    /*                 STRUCTS                  */
-    /* ---------------------------------------- */
-    struct QuestReward {
-        uint256 tokenId;
-        string uri;
-        uint256 maxClaimed; // TODO: Will probably remove
-        address payable author;
-        uint256 price;
-    }
-    /* -----------------*****------------------ */
+contract CampfiresExperiencePoints is ERC20, AccessControl {
+    bytes32 public constant CAMPFIRES_QUEST_REWARDS_ROLE =
+        keccak256("CAMPFIRES_QUEST_REWARDS_ROLE");
+    address public campfiresQuestRewards;
 
-    /* ---------------------------------------- */
-    /*                  ERRORS                  */
-    /* ---------------------------------------- */
-    error InvalidTokenID();
-    /* -----------------*****------------------ */
+    event SetCampfiresQuestRewards(address indexed campfiresQuestRewards);
 
-    /* ---------------------------------------- */
-    /*                PROPERTIES                */
-    /* ---------------------------------------- */
-    /// @notice Signature verifier.
-    address public verifier;
-
-    /// @notice Stores all created quest rewards.
-    mapping(uint256 => QuestReward) public questRewards;
-
-    /// @notice Records claimed quest rewards for an account.
-    mapping(address => mapping(uint256 => bool)) public claimedQuestRewards;
-
-    /// @notice The next token ID to be minted.
-    uint256 private _currentIndex;
-
-    /* -----------------*****------------------ */
-
-    /* ---------------------------------------- */
-    /*                  EVENTS                  */
-    /* ---------------------------------------- */
-    event CreateQuest(
-        uint256 indexed tokenId,
-        string indexed tokenURI,
-        address indexed author,
-        uint256 price
-    );
-    event ClaimQuestReward();
-
-    /* -----------------*****------------------ */
-
-    constructor(address _verifier) ERC20("Campfires Experience Points", "CEP") {
-        require(_verifier != address(0), "empty verifier address");
-        _currentIndex = 1;
-        verifier = _verifier;
+    constructor() ERC20("Campfires Experience Points", "CEP") {
+        _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
 
-    /* ---------------------------------------- */
-    /*             PUBLIC FUNCTIONS             */
-    /* ---------------------------------------- */
-    function uri(
-        uint256 id
-    ) public view virtual override returns (string memory) {
-        return string(abi.encodePacked(questRewards[id].uri, id));
-    }
-
-    function createQuestReward(
-        string calldata tokenURI,
-        uint256 price
-    ) external {
-        questRewards[_currentIndex] = QuestReward(
-            _currentIndex,
-            tokenURI,
-            0,
-            payable(_msgSender()),
-            price
-        );
-        emit CreateQuest(_currentIndex, tokenURI, _msgSender(), price);
-        _currentIndex++;
-    }
-
-    function claimQuestReward(
-        uint256 id,
-        uint256 nonce,
-        bytes calldata signature
-    ) external {
-        if (questRewards[id].tokenId == 0) revert InvalidTokenID();
-
-        address recovered = ECDSA.recover(
-            ECDSA.toEthSignedMessageHash(
-                keccak256(abi.encode(_msgSender(), id, nonce))
-            ),
-            signature
+    function setCampfiresQuestRewards(
+        address _campfiresQuestRewards
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        // campfiresQuestRewards can't be set to immutable
+        require(
+            campfiresQuestRewards == address(0),
+            "campfiresQuestRewards already set"
         );
         require(
-            recovered == verifier,
-            "recovered addr does not match verifier"
+            _campfiresQuestRewards != address(0),
+            "_campfiresQuestRewards empty addr"
         );
 
-        _mint(_msgSender(), id, 1, signature);
-        claimedQuestRewards[_msgSender()][id] = true;
+        campfiresQuestRewards = _campfiresQuestRewards;
+        _setupRole(CAMPFIRES_QUEST_REWARDS_ROLE, _campfiresQuestRewards);
 
-        emit ClaimQuestReward();
+        emit SetCampfiresQuestRewards(_campfiresQuestRewards);
     }
-    /* -----------------*****------------------ */
+
+    function mintTo(
+        address _to,
+        uint256 _amount
+    ) external onlyRole(CAMPFIRES_QUEST_REWARDS_ROLE) {
+        require(_to != address(0), "to empty addr");
+
+        _mint(_to, _amount);
+    }
+
+    function burn(
+        address account,
+        uint256 amount
+    ) external onlyRole(CAMPFIRES_QUEST_REWARDS_ROLE) {
+        _burn(account, amount);
+    }
 }
