@@ -7,8 +7,27 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 /// @title CampfiresLandParcel
 /// @author Carlo Miguel Dy
 contract CampfiresLandParcel is ERC721A, AccessControl {
-    constructor() ERC721A("Campfires Land Parcel", "CLP") {
+    bytes32 public constant CAMPFIRES_EXPERIENCE_POINT_ROLE =
+        keccak256("CAMPFIRES_EXPERIENCE_POINT_ROLE");
+
+    address public campfiresExperiencePoint;
+
+    constructor(
+        address _campfiresExperiencePoint
+    ) ERC721A("Campfires Land Parcel", "CLP") {
+        require(
+            _campfiresExperiencePoint != address(0),
+            "_campfiresExperiencePoint empty addr"
+        );
+
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+        _setupRole(CAMPFIRES_EXPERIENCE_POINT_ROLE, _campfiresExperiencePoint);
+
+        campfiresExperiencePoint = _campfiresExperiencePoint;
+    }
+
+    function claimLandParcel(uint256 experiencePoints) external {
+        // TODO: Need more information on claiming land parcels
     }
 
     function supportsInterface(
