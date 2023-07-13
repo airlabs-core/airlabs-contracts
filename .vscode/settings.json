@@ -1,6 +1,8 @@
 {
-  "solidity.packageDefaultDependenciesContractsDirectory": "src",
-  "solidity.packageDefaultDependenciesDirectory": "lib",
+  // "solidity.compileUsingRemoteVersion": "latest",
+
+  "solidity.packageDefaultDependenciesContractsDirectory": "",
+  "solidity.packageDefaultDependenciesDirectory": "",
   "solidity.remappings": [
     "forge-std/=lib/forge-std/src/",
     "@openzeppelin/=lib/openzeppelin-contracts/",
@@ -16,4 +18,5 @@
     "@openzeppelin/=lib/openzeppelin-contracts/",
     "erc721a/=lib/erc721a/"
   ],
+  "solidity.defaultCompiler": "remote",
 }
