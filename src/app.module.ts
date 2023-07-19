@@ -4,14 +4,16 @@ import { AppService } from './app.service';
 import { Erc20Module } from './erc20/erc20.module';
 import { ConfigModule } from '@nestjs/config';
 import { SignerModule } from './signer/signer.module';
+import { Web3Module } from './web3/web3.module';
 
 @Module({
   imports: [
-    Erc20Module,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    Erc20Module,
     SignerModule,
+    Web3Module,
   ],
   controllers: [AppController],
   providers: [AppService],
