@@ -1,14 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { JsonRpcProvider, Signer, Wallet } from 'ethers';
+import { Signer, Wallet } from 'ethers';
+import { Network, Web3Service } from 'src/web3/web3.service';
 
 @Injectable()
 export class SignerService {
-  provider: JsonRpcProvider;
-  signer: Signer;
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly web3Service: Web3Service,
+  ) {}
 
-  constructor(private readonly configService: ConfigService) {
-    this.provider = new JsonRpcProvider(this.configService.get('JSON_RPC_URL'));
-    this.signer = new Wallet(this.configService.get('VERIFIER_PRIVATE_KEY'));
+  public getSigner(network: Network): Signer {
+    return new Wallet(
+      this.configService.get('VERIFIER_PRIVATE_KEY'),
+      this.web3Service.getProvider(network),
+    );
   }
 }
