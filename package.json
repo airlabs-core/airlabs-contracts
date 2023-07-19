@@ -6,9 +6,10 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "postinstall": "pnpm typechain",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "typechain": "typechain --target=ethers-v5 **/*/abis/*.json",
+    "typechain": "rimraf ./types && typechain --target=ethers-v6 **/*/abis/*.json",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
@@ -26,9 +27,10 @@
     "@nestjs/core": "^10.0.0",
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^10.0.0",
-    "@typechain/ethers-v5": "^11.0.0",
+    "@typechain/ethers-v6": "^0.4.2",
     "ethers": "^6.6.4",
     "reflect-metadata": "^0.1.13",
+    "rimraf": "^5.0.1",
     "rxjs": "^7.8.1",
     "typechain": "^8.2.0"
   },
