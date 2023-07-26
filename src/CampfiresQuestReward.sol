@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.19;
 
-import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import "./interfaces/ICampfiresExperiencePoints.sol";
+import "openzeppelin-contracts/token/ERC1155/ERC1155.sol";
+import "openzeppelin-contracts/utils/cryptography/ECDSA.sol";
+import "./interfaces/ICampfiresExperiencePoint.sol";
 
 /// @title CampfiresQuestReward
 /// @author Carlo Miguel Dy
@@ -17,7 +17,7 @@ contract CampfiresQuestReward is ERC1155 {
         uint256 maxClaimed; // TODO: Will probably remove
         address payable author;
         uint256 price; // ? Price is for what?
-        uint256 experiencePoints; 
+        uint256 experiencePoints;
     }
     /* -----------------*****------------------ */
 
@@ -121,7 +121,7 @@ contract CampfiresQuestReward is ERC1155 {
         );
 
         _mint(_msgSender(), id, 1, signature);
-        ICampfiresExperiencePoints(campfiresExperiencePoints).mintTo(
+        ICampfiresExperiencePoint(campfiresExperiencePoints).mintTo(
             _msgSender(),
             questRewards[id].experiencePoints
         );
