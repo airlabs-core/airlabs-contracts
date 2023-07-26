@@ -1,22 +1,24 @@
 {
   // "solidity.compileUsingRemoteVersion": "latest",
-
   "solidity.packageDefaultDependenciesContractsDirectory": "",
   "solidity.packageDefaultDependenciesDirectory": "",
   "solidity.remappings": [
     "forge-std/=lib/forge-std/src/",
     "@openzeppelin/=lib/openzeppelin-contracts/",
-    "erc721a/=lib/erc721a/"
+    "erc721a/=lib/erc721a/",
+    "tokenbound/=lib/tokenbound/src/"
   ],
   "solidity.remappingsUnix": [
     "forge-std/=lib/forge-std/src/",
     "@openzeppelin/=lib/openzeppelin-contracts/",
-    "erc721a/=lib/erc721a/"
+    "erc721a/=lib/erc721a/",
+    "tokenbound/=lib/tokenbound/src/"
   ],
   "solidity.remappingsWindows": [
     "forge-std/=lib/forge-std/src/",
     "@openzeppelin/=lib/openzeppelin-contracts/",
-    "erc721a/=lib/erc721a/"
+    "erc721a/=lib/erc721a/",
+    "tokenbound/=lib/tokenbound/src/"
   ],
   "solidity.defaultCompiler": "remote",
 }

@@ -7,7 +7,8 @@ remappings = [
     "@solmate-utils/=lib/solmate/src/utils/",
     "forge-std/=lib/forge-std/src/",
     "@openzeppelin/=lib/openzeppelin-contracts/",
-    "erc721a/=lib/erc721a/"
+    "erc721a/=lib/erc721a/",
+    "tokenbound/=lib/tokenbound/src/"
 ]
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
