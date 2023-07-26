@@ -2,9 +2,9 @@
 pragma solidity ^0.8.19;
 
 import "forge-std/Test.sol";
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import "../src/CampfiresQuestReward.sol";
-import "../src/CampfiresExperiencePoint.sol";
+import {ECDSA} from "openzeppelin-contracts/utils/cryptography/ECDSA.sol";
+import {CampfiresQuestReward} from "../src/CampfiresQuestReward.sol";
+import {CampfiresExperiencePoint} from "../src/CampfiresExperiencePoint.sol";
 
 contract CampfiresQuestRewardTest is Test {
     CampfiresQuestReward public campfiresQuestReward;
