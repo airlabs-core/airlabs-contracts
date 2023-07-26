@@ -5,6 +5,8 @@ import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "./interfaces/ICampfiresExperiencePoints.sol";
 
+/// @title CampfiresQuestReward
+/// @author Carlo Miguel Dy
 contract CampfiresQuestReward is ERC1155 {
     /* ---------------------------------------- */
     /*                 STRUCTS                  */
