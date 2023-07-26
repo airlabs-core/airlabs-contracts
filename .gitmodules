@@ -7,3 +7,6 @@
 [submodule "lib/erc721a"]
 	path = lib/erc721a
 	url = https://github.com/chiru-labs/erc721a
+[submodule "lib/tokenbound"]
+	path = lib/tokenbound
+	url = https://github.com/tokenbound/contracts
