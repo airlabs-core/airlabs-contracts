@@ -6,8 +6,11 @@ solc = "0.8.19"
 remappings = [
     "@solmate-utils/=lib/solmate/src/utils/",
     "forge-std/=lib/forge-std/src/",
-    "@openzeppelin/=lib/openzeppelin-contracts/",
-    "erc721a/=lib/erc721a/"
+    "erc721a/=lib/erc721a/contracts/",
+    "tokenbound/=lib/tokenbound/src/",
+    "erc6551/=lib/reference/src/",
+    "account-abstraction/=lib/account-abstraction/contracts/",
+    "openzeppelin-contracts/=lib/openzeppelin-contracts/contracts/"
 ]
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config

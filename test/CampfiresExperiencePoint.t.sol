@@ -3,7 +3,7 @@ pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
 import "../src/CampfiresExperiencePoint.sol";
-import "../src/CampfiresQuestReward.sol";
+import {CampfiresQuestReward} from "../src/CampfiresQuestReward.sol";
 
 contract CampfiresExperiencePointTest is Test {
     CampfiresExperiencePoint public campfiresExperiencePoint;
