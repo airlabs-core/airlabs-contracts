@@ -1,3 +1,4 @@
+/* solhint-disable no-console */
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
@@ -13,7 +14,7 @@ import {AccountGuardian} from "tokenbound/AccountGuardian.sol";
 
 import {CampfiresLandParcelMock} from "../src/mock/CampfiresLandParcelMock.sol";
 import {CampfiresQuestRewardMock} from "../src/mock/CampfiresQuestRewardMock.sol";
-import {CampfiresExperiencePoint} from "../src/CampfiresExperiencePoint.sol";
+import {CampfiresExperiencePointMock} from "../src/mock/CampfiresExperiencePointMock.sol";
 
 contract CampfiresLandParcelTest is Test {
     address public verifier;
@@ -26,7 +27,7 @@ contract CampfiresLandParcelTest is Test {
 
     // campfires
     CampfiresLandParcelMock public landParcel;
-    CampfiresExperiencePoint public experiencePoint;
+    CampfiresExperiencePointMock public experiencePoint;
     CampfiresQuestRewardMock public questReward;
 
     function setUp() public {
@@ -43,7 +44,7 @@ contract CampfiresLandParcelTest is Test {
         registry = new ERC6551Registry();
 
         // campfires
-        experiencePoint = new CampfiresExperiencePoint();
+        experiencePoint = new CampfiresExperiencePointMock();
         questReward = new CampfiresQuestRewardMock(
             verifier,
             address(experiencePoint)
@@ -114,5 +115,28 @@ contract CampfiresLandParcelTest is Test {
 
         assertEq(questReward.balanceOf(accountAddress, 1), 4);
         assertEq(questReward.balanceOf(user, 1), 1);
+    }
+
+    function testClaim() public {
+        address user = vm.addr(0x002);
+        console.log(user);
+
+        experiencePoint.mint(user, 20_000);
+        assertEq(experiencePoint.balanceOf(user), 20_000);
+
+        vm.prank(user);
+        (uint256 tokenId, address accountAddress) = landParcel.claim();
+
+        assertEq(landParcel.balanceOf(user), 1);
+        assertEq(
+            registry.account(
+                address(implementation),
+                block.chainid,
+                address(landParcel),
+                tokenId,
+                0
+            ),
+            accountAddress
+        );
     }
 }
