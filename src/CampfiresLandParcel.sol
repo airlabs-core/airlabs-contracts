@@ -44,7 +44,7 @@ contract CampfiresLandParcel is ERC721A, AccessControl {
 
     function getAccount(uint256 tokenId) public view returns (address) {
         return
-            registry.account(
+            erc6551Registry.account(
                 address(erc6551Implementation),
                 block.chainid,
                 address(this),
@@ -53,24 +53,29 @@ contract CampfiresLandParcel is ERC721A, AccessControl {
             );
     }
 
-    function claim() external {
+    function claim()
+        external
+        returns (uint256 tokenId, address accountAddress)
+    {
         require(
-            experiencePoint.balanceOf(_msgSender()) == 20_000,
+            experiencePoint.balanceOf(_msgSender()) >= 20_000,
             "not enough points to claim"
         );
 
         uint256 tokenId = _nextTokenId();
         _mint(_msgSender(), 1);
 
-        address accountAddress = registry.createAccount(
+        address accountAddress = erc6551Registry.createAccount(
             address(erc6551Implementation),
             block.chainid,
             address(this),
             tokenId,
-            0
+            0,
+            ""
         );
 
         emit Claim(_msgSender(), accountAddress, tokenId);
+        return (tokenId, accountAddress);
     }
 
     function supportsInterface(
