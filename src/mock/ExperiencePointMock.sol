@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.19;
 
-import "../CampfiresExperiencePoint.sol";
+import "../ExperiencePoint.sol";
 
-contract CampfiresExperiencePointMock is CampfiresExperiencePoint {
+contract ExperiencePointMock is ExperiencePoint {
     function mint(address to, uint256 amount) external {
         _mint(to, amount);
     }

@@ -3,15 +3,15 @@ pragma solidity ^0.8.19;
 
 import "openzeppelin-contracts/token/ERC1155/ERC1155.sol";
 import "openzeppelin-contracts/utils/cryptography/ECDSA.sol";
-import "./interfaces/ICampfiresExperiencePoint.sol";
+import "./interfaces/IExperiencePoint.sol";
 
-/// @title CampfiresQuestReward
+/// @title QuestReward
 /// @author Carlo Miguel Dy
-contract CampfiresQuestReward is ERC1155 {
+contract QuestReward is ERC1155 {
     /* ---------------------------------------- */
     /*                 STRUCTS                  */
     /* ---------------------------------------- */
-    struct QuestReward {
+    struct QuestRewardObject {
         uint256 tokenId;
         string uri;
         uint256 maxClaimed; // TODO: Will probably remove
@@ -31,13 +31,13 @@ contract CampfiresQuestReward is ERC1155 {
     /*                PROPERTIES                */
     /* ---------------------------------------- */
     /// @notice Contract address for experience points.
-    address public campfiresExperiencePoints;
+    address public experiencePoint;
 
     /// @notice Signature verifier.
     address public verifier;
 
     /// @notice Stores all created quest rewards.
-    mapping(uint256 => QuestReward) public questRewards;
+    mapping(uint256 => QuestRewardObject) public questRewards;
 
     /// @notice Records claimed quest rewards for an account.
     mapping(address => mapping(uint256 => bool)) public claimedQuestRewards;
@@ -50,29 +50,23 @@ contract CampfiresQuestReward is ERC1155 {
     /* ---------------------------------------- */
     /*                  EVENTS                  */
     /* ---------------------------------------- */
-    event CreateQuest(
+    event CreateQuestObject(
         uint256 indexed tokenId,
         string indexed tokenURI,
         address indexed author,
         uint256 price
     );
-    event ClaimQuestReward();
+    event ClaimQuestRewardObject();
 
     /* -----------------*****------------------ */
 
-    constructor(
-        address _verifier,
-        address _campfiresExperiencePoints
-    ) ERC1155("") {
+    constructor(address _verifier, address _experiencePoint) ERC1155("") {
         require(_verifier != address(0), "_verifier empty addr");
-        require(
-            _campfiresExperiencePoints != address(0),
-            "_campfiresExperiencePoints empty addr"
-        );
+        require(_experiencePoint != address(0), "_experiencePoint empty addr");
 
         _currentIndex = 1;
         verifier = _verifier;
-        campfiresExperiencePoints = _campfiresExperiencePoints;
+        experiencePoint = _experiencePoint;
     }
 
     /* ---------------------------------------- */
@@ -85,12 +79,12 @@ contract CampfiresQuestReward is ERC1155 {
     }
 
     // ? Should anyone be allowed to set arbitrary value for experience points of a quest reward?
-    function createQuestReward(
+    function createQuestRewardObject(
         string calldata tokenURI,
         uint256 price,
         uint256 experiencePoints
     ) external {
-        questRewards[_currentIndex] = QuestReward(
+        questRewards[_currentIndex] = QuestRewardObject(
             _currentIndex,
             tokenURI,
             0,
@@ -98,11 +92,11 @@ contract CampfiresQuestReward is ERC1155 {
             price,
             experiencePoints
         );
-        emit CreateQuest(_currentIndex, tokenURI, _msgSender(), price);
+        emit CreateQuestObject(_currentIndex, tokenURI, _msgSender(), price);
         _currentIndex++;
     }
 
-    function claimQuestReward(
+    function claimQuestRewardObject(
         uint256 id,
         uint256 nonce,
         bytes calldata signature
@@ -121,13 +115,13 @@ contract CampfiresQuestReward is ERC1155 {
         );
 
         _mint(_msgSender(), id, 1, signature);
-        ICampfiresExperiencePoint(campfiresExperiencePoints).mintTo(
+        IExperiencePoint(experiencePoint).mintTo(
             _msgSender(),
             questRewards[id].experiencePoints
         );
         claimedQuestRewards[_msgSender()][id] = true;
 
-        emit ClaimQuestReward();
+        emit ClaimQuestRewardObject();
     }
     /* -----------------*****------------------ */
 }

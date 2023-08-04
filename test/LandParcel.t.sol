@@ -12,11 +12,11 @@ import "erc6551/interfaces/IERC6551Account.sol";
 import {Account as TokenboundAccount} from "tokenbound/Account.sol";
 import {AccountGuardian} from "tokenbound/AccountGuardian.sol";
 
-import {CampfiresLandParcelMock} from "../src/mock/CampfiresLandParcelMock.sol";
-import {CampfiresQuestRewardMock} from "../src/mock/CampfiresQuestRewardMock.sol";
-import {CampfiresExperiencePointMock} from "../src/mock/CampfiresExperiencePointMock.sol";
+import {LandParcelMock} from "../src/mock/LandParcelMock.sol";
+import {QuestRewardMock} from "../src/mock/QuestRewardMock.sol";
+import {ExperiencePointMock} from "../src/mock/ExperiencePointMock.sol";
 
-contract CampfiresLandParcelTest is Test {
+contract LandParcelTest is Test {
     address public verifier;
 
     // eip6551
@@ -25,10 +25,9 @@ contract CampfiresLandParcelTest is Test {
     ERC6551Registry public registry;
     IEntryPoint public entryPoint;
 
-    // campfires
-    CampfiresLandParcelMock public landParcel;
-    CampfiresExperiencePointMock public experiencePoint;
-    CampfiresQuestRewardMock public questReward;
+    LandParcelMock public landParcel;
+    ExperiencePointMock public experiencePoint;
+    QuestRewardMock public questReward;
 
     function setUp() public {
         uint256 privateKey = 0x1010101010101010101010101010101010101010101010101010101010101010;
@@ -43,20 +42,19 @@ contract CampfiresLandParcelTest is Test {
         );
         registry = new ERC6551Registry();
 
-        // campfires
-        experiencePoint = new CampfiresExperiencePointMock();
-        questReward = new CampfiresQuestRewardMock(
+        experiencePoint = new ExperiencePointMock();
+        questReward = new QuestRewardMock(
             verifier,
             address(experiencePoint)
         );
-        landParcel = new CampfiresLandParcelMock(
+        landParcel = new LandParcelMock(
             address(experiencePoint),
             address(implementation),
             address(registry)
         );
 
-        experiencePoint.setCampfiresLandParcel(address(landParcel));
-        experiencePoint.setCampfiresQuestReward(address(questReward));
+        experiencePoint.setLandParcel(address(landParcel));
+        experiencePoint.setQuestReward(address(questReward));
     }
 
     function testNothing() public {

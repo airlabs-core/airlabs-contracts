@@ -3,12 +3,12 @@ pragma solidity ^0.8.19;
 
 import "forge-std/Test.sol";
 import {ECDSA} from "openzeppelin-contracts/utils/cryptography/ECDSA.sol";
-import {CampfiresQuestReward} from "../src/CampfiresQuestReward.sol";
-import {CampfiresExperiencePoint} from "../src/CampfiresExperiencePoint.sol";
+import {QuestReward} from "../src/QuestReward.sol";
+import {ExperiencePoint} from "../src/ExperiencePoint.sol";
 
-contract CampfiresQuestRewardTest is Test {
-    CampfiresQuestReward public campfiresQuestReward;
-    CampfiresExperiencePoint public campfiresExperiencePoint;
+contract QuestRewardTest is Test {
+    QuestReward public questReward;
+    ExperiencePoint public experiencePoint;
     uint256 public verifierPrivateKey =
         0x1010101010101010101010101010101010101010101010101010101010101010;
 
@@ -19,18 +19,13 @@ contract CampfiresQuestRewardTest is Test {
     function setUp() public {
         verifier = vm.addr(verifierPrivateKey);
 
-        campfiresExperiencePoint = new CampfiresExperiencePoint();
-        campfiresQuestReward = new CampfiresQuestReward(
-            verifier,
-            address(campfiresExperiencePoint)
-        );
-        campfiresExperiencePoint.setCampfiresQuestReward(
-            address(campfiresQuestReward)
-        );
+        experiencePoint = new ExperiencePoint();
+        questReward = new QuestReward(verifier, address(experiencePoint));
+        experiencePoint.setQuestReward(address(questReward));
 
         // create quest reward
         vm.prank(admin);
-        campfiresQuestReward.createQuestReward(
+        questReward.createQuestRewardObject(
             "https://assets.campfires.gg/1.json", // uri
             5000, // price
             9000 // experiencePoints
@@ -42,7 +37,7 @@ contract CampfiresQuestRewardTest is Test {
             address payable author,
             uint256 price,
 
-        ) = campfiresQuestReward.questRewards(1);
+        ) = questReward.questRewards(1);
 
         assertEq(tokenId, 1);
         assertEq(admin, author);
@@ -64,13 +59,13 @@ contract CampfiresQuestRewardTest is Test {
 
         vm.prank(account);
         console.log("account %s", account);
-        console.log("campfiresQuestReward %s", address(campfiresQuestReward));
+        console.log("questReward %s", address(questReward));
 
-        campfiresQuestReward.claimQuestReward(tokenId, nonce, signature);
-        bool claimed = campfiresQuestReward.claimedQuestRewards(account, 1);
+        questReward.claimQuestRewardObject(tokenId, nonce, signature);
+        bool claimed = questReward.claimedQuestRewards(account, 1);
 
         assertEq(claimed, true);
-        assertEq(campfiresQuestReward.balanceOf(account, 1), 1);
-        assertEq(campfiresExperiencePoint.balanceOf(account), 9000);
+        assertEq(questReward.balanceOf(account, 1), 1);
+        assertEq(experiencePoint.balanceOf(account), 9000);
     }
 }
