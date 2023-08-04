@@ -100,23 +100,25 @@ contract LandParcel is ERC721A, AccessControl {
         return (tokenId, accountAddress);
     }
 
-    /**
-     * @notice Stake $EXP tokens using token bound account.
-     * @param _tokenId uint256 : The tokenId of a token bound account.
-     * @param _amount uint256 : The amount of $EXP tokens to be staked.
-     */
-    function stakeExperiencePoints(uint256 _tokenId, uint256 _amount) external {
-        address accountAddress = getAccount(_tokenId);
-        Account account = Account(payable(accountAddress));
-        require(account.isAuthorized(_msgSender()), "caller not authorized");
+    // /**
+    //  * @notice Stake $EXP tokens using token bound account.
+    //  * @param _tokenId uint256 : The tokenId of a token bound account.
+    //  * @param _amount uint256 : The amount of $EXP tokens to be staked.
+    //  */
+    // function stakeExperiencePoints(uint256 _tokenId, uint256 _amount) external {
+    //     address accountAddress = getAccount(_tokenId);
+    //     Account account = Account(payable(accountAddress));
+    //     require(account.isAuthorized(_msgSender()), "caller not authorized");
+    //     account.
 
-        bytes memory stakeCall = abi.encodeWithSignature(
-            "stake(uint256)",
-            _amount
-        );
-        account.executeCall(payable(address(stakingRewards)), 0, stakeCall);
-        emit StakeExperiencePoints(_tokenId, _amount, accountAddress);
-    }
+    //     bytes memory stakeCall = abi.encodeWithSignature(
+    //         "stake(uint256)",
+    //         _amount
+    //     );
+    //     account.executeCall(payable(address(stakingRewards)), 0, stakeCall);
+
+    //     emit StakeExperiencePoints(_tokenId, _amount, accountAddress);
+    // }
 
     function supportsInterface(
         bytes4 interfaceId

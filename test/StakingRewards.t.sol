@@ -78,13 +78,41 @@ contract StakingRewardsTest is Test {
         assertEq(landParcel.balanceOf(user), 1);
         assertEq(landParcel.getAccount(tokenId), accountAddress);
 
-
         TokenboundAccount account = TokenboundAccount(payable(accountAddress));
         assertEq(account.isAuthorized(user), true);
 
         stakingToken.mint(accountAddress, stakeAmount);
+        vm.prank(accountAddress);
+        stakingToken.approve(address(stakingRewards), stakeAmount);
+
+        // // ! fails
+        // vm.prank(user);
+        // landParcel.stakeExperiencePoints(tokenId, stakeAmount);
+
+        // succeeds
+        bytes memory stakeCall = abi.encodeWithSignature(
+            "stake(uint256)",
+            stakeAmount
+        );
         vm.prank(user);
-        // ! fails
-        landParcel.stakeExperiencePoints(tokenId, stakeAmount);
+        account.executeCall(payable(address(stakingRewards)), 0, stakeCall);
+        assertEq(stakingRewards.balanceOf(accountAddress), stakeAmount);
+        assertEq(stakingRewards.totalSupply(), stakeAmount);
+        
+
+        stakingRewards.notifyRewardAmount(5000);
+
+        console.log(
+            "stakingRewards.totalSupply()",
+            stakingRewards.totalSupply()
+        );
+        console.log(
+            "stakingRewards.earned(accountAddress)",
+            stakingRewards.earned(accountAddress)
+        );
+        console.log(
+            "stakingRewards.balanceOf(accountAddress)",
+            stakingRewards.balanceOf(accountAddress)
+        );
     }
 }
