@@ -132,4 +132,21 @@ contract LandParcel is ERC721A, AccessControl {
     function _startTokenId() internal view virtual override returns (uint256) {
         return 1;
     }
+
+    /**
+     * @dev See {ERC721A-_beforeTokenTransfers}.
+     */
+    function _beforeTokenTransfers(
+        address from,
+        address to,
+        uint256 startTokenId,
+        uint256 quantity
+    ) internal virtual override {
+        require(
+            stakingRewards.balanceOf(getAccount(startTokenId)) == 0,
+            "cannot transfer when tokens are staked"
+        );
+
+        super._beforeTokenTransfers(from, to, startTokenId, quantity);
+    }
 }
