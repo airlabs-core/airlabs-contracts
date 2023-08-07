@@ -15,6 +15,7 @@ import "../src/mock/ExperiencePointMock.sol";
 
 contract StakingRewardsTest is Test {
     address public user;
+    address public user2;
 
     LandParcelMock public landParcel;
     ExperiencePointMock public stakingToken;
@@ -29,6 +30,7 @@ contract StakingRewardsTest is Test {
 
     function setUp() public {
         user = vm.addr(0x0069);
+        user2 = vm.addr(0x008930);
 
         stakingToken = new ExperiencePointMock();
         rewardsToken = new ExperiencePointMock();
@@ -98,21 +100,42 @@ contract StakingRewardsTest is Test {
         account.executeCall(payable(address(stakingRewards)), 0, stakeCall);
         assertEq(stakingRewards.balanceOf(accountAddress), stakeAmount);
         assertEq(stakingRewards.totalSupply(), stakeAmount);
-        
 
-        stakingRewards.notifyRewardAmount(5000);
+        // stakingRewards.notifyRewardAmount(5000);
 
-        console.log(
-            "stakingRewards.totalSupply()",
-            stakingRewards.totalSupply()
+        // attempt transfer with stake
+        vm.prank(user);
+        vm.expectRevert("cannot transfer when tokens are staked");
+        landParcel.transferFrom(user, user2, tokenId);
+
+        // withdraw stake
+        bytes memory withdrawCall = abi.encodeWithSignature(
+            "withdraw(uint256)",
+            stakeAmount
         );
-        console.log(
-            "stakingRewards.earned(accountAddress)",
-            stakingRewards.earned(accountAddress)
-        );
-        console.log(
-            "stakingRewards.balanceOf(accountAddress)",
-            stakingRewards.balanceOf(accountAddress)
-        );
+        vm.prank(user);
+        account.executeCall(payable(address(stakingRewards)), 0, withdrawCall);
+        assertEq(stakingRewards.balanceOf(accountAddress), 0);
+        assertEq(stakingRewards.totalSupply(), 0);
+
+        // attempt transfer with stake
+        vm.prank(user);
+        landParcel.transferFrom(user, user2, tokenId);
+        assertEq(landParcel.balanceOf(user), 0);
+        assertEq(landParcel.balanceOf(user2), 1);
+        assertEq(landParcel.ownerOf(tokenId), user2);
+
+        // console.log(
+        //     "stakingRewards.totalSupply()",
+        //     stakingRewards.totalSupply()
+        // );
+        // console.log(
+        //     "stakingRewards.earned(accountAddress)",
+        //     stakingRewards.earned(accountAddress)
+        // );
+        // console.log(
+        //     "stakingRewards.balanceOf(accountAddress)",
+        //     stakingRewards.balanceOf(accountAddress)
+        // );
     }
 }
