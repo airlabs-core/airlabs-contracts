@@ -15,6 +15,7 @@ import {AccountGuardian} from "tokenbound/AccountGuardian.sol";
 import {LandParcelMock} from "../src/mock/LandParcelMock.sol";
 import {QuestRewardMock} from "../src/mock/QuestRewardMock.sol";
 import {ExperiencePointMock} from "../src/mock/ExperiencePointMock.sol";
+import {StakingRewards} from "../src/StakingRewards.sol";
 
 contract LandParcelTest is Test {
     address public verifier;
@@ -25,8 +26,10 @@ contract LandParcelTest is Test {
     ERC6551Registry public registry;
     IEntryPoint public entryPoint;
 
+    StakingRewards public stakingRewards;
     LandParcelMock public landParcel;
     ExperiencePointMock public experiencePoint;
+    ExperiencePointMock public rewardsToken;
     QuestRewardMock public questReward;
 
     function setUp() public {
@@ -43,14 +46,17 @@ contract LandParcelTest is Test {
         registry = new ERC6551Registry();
 
         experiencePoint = new ExperiencePointMock();
-        questReward = new QuestRewardMock(
-            verifier,
-            address(experiencePoint)
+        rewardsToken = new ExperiencePointMock();
+        stakingRewards = new StakingRewards(
+            address(experiencePoint),
+            address(rewardsToken)
         );
+        questReward = new QuestRewardMock(verifier, address(experiencePoint));
         landParcel = new LandParcelMock(
             address(experiencePoint),
             address(implementation),
-            address(registry)
+            address(registry),
+            address(stakingRewards)
         );
 
         experiencePoint.setLandParcel(address(landParcel));
