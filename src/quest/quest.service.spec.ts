@@ -28,7 +28,24 @@ describe('QuestService', () => {
       json_url: 'json_url',
       max_claimed: 0,
       name: 'name',
-      requirements: [{ title: 'Must hold at least 10 $ETH' }],
+      requirements: [
+        {
+          chain_id: 1,
+          title: 'check balance',
+          contract_address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+          abi: [
+            'function balanceOf(address owner) view returns (uint256)',
+            'event Transfer(address indexed from, address indexed to, uint amount)',
+          ],
+          callables: [
+            {
+              selector:
+                'function balanceOf(address owner) view returns (uint256)',
+              args: ['0x3E8c686F499C877D8f4aFB1215b6f0935796b986'],
+            },
+          ],
+        },
+      ],
     };
     console.log(quest);
   });
